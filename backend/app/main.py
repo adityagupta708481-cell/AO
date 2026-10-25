@@ -55,24 +55,7 @@ app = FastAPI(
     openapi_url=None if is_prod else "/openapi.json",
     lifespan=lifespan
 )
-raw_origins = os.getenv(
-    "ALLOWED_ORIGINS", 
-    "https://ao-bwb.pages.dev"
-)
-origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 
-configured_origins = settings.get_cors_origins()
-allow_all = configured_origins == ["*"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=configured_origins,
-    allow_origin_regex=r"^https:\/\/.*\.pages\.dev$",
-    allow_credentials=not allow_all,  # Browsers forbid allow_credentials=True when origin is wildcard *
-    allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Retry-After"],
-)
 
 # 1. GZip Compression Middleware (Compress JSON responses > 1KB)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -90,11 +73,13 @@ allow_all = configured_origins == ["*"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=configured_origins,
+    allow_origin_regex=r"^https:\/\/.*\.pages\.dev$",
     allow_credentials=not allow_all,  # Browsers forbid allow_credentials=True when origin is wildcard *
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["Retry-After"],
 )
+
 
 # 4. Global Error Handlers (Information Leak Prevention)
 @app.exception_handler(StarletteHTTPException)
