@@ -55,6 +55,21 @@ app = FastAPI(
     openapi_url=None if is_prod else "/openapi.json",
     lifespan=lifespan
 )
+raw_origins = os.getenv(
+    "ALLOWED_ORIGINS", 
+    "https://ao-bwb.pages.dev"
+)
+origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    # Regex allows any preview branch deployed on Cloudflare Pages (*.pages.dev)
+    allow_origin_regex=r"https://.*\.pages\.dev",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 1. GZip Compression Middleware (Compress JSON responses > 1KB)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
