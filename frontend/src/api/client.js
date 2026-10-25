@@ -2,7 +2,7 @@
 // In local development, it defaults to '/api' for Vite dev proxy forwarding.
 const DEFAULT_API_BASE = import.meta.env.DEV
   ? '/api'
-  : 'https://algoorbit.onrender.com/api';
+  : 'https://ao-r67t.onrender.com/api';
 
 let rawBase = (import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE).trim().replace(/\/+$/, '');
 if (rawBase && !rawBase.startsWith('http://') && !rawBase.startsWith('https://') && !rawBase.startsWith('/')) {
