@@ -61,14 +61,17 @@ raw_origins = os.getenv(
 )
 origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
 
+configured_origins = settings.get_cors_origins()
+allow_all = configured_origins == ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    # Regex allows any preview branch deployed on Cloudflare Pages (*.pages.dev)
-    allow_origin_regex=r"https://.*\.pages\.dev",
-    allow_credentials=True,
+    allow_origins=configured_origins,
+    allow_origin_regex=r"^https:\/\/.*\.pages\.dev$",
+    allow_credentials=not allow_all,  # Browsers forbid allow_credentials=True when origin is wildcard *
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Retry-After"],
 )
 
 # 1. GZip Compression Middleware (Compress JSON responses > 1KB)
